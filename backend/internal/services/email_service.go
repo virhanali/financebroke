@@ -3,7 +3,7 @@ package services
 import (
 	"fmt"
 	"net/smtp"
-	"finance-app/backend/internal/entity"
+	"financebroke/backend/internal/entity"
 )
 
 type EmailService struct {

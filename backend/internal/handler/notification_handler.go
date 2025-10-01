@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"finance-app/backend/internal/dto"
-	"finance-app/backend/internal/usecase"
+	"financebroke/backend/internal/dto"
+	"financebroke/backend/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )

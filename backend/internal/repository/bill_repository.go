@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"finance-app/backend/internal/entity"
+	"financebroke/backend/internal/entity"
 	"time"
 )
 

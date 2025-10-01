@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"finance-app/backend/internal/entity"
+	"financebroke/backend/internal/entity"
 )
 
 type TelegramService struct {

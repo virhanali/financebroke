@@ -1,6 +1,6 @@
 package dto
 
-import "finance-app/backend/internal/entity"
+import "financebroke/backend/internal/entity"
 
 type DashboardResponse struct {
 	TotalBills    int64          `json:"total_bills"`

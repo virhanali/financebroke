@@ -3,7 +3,7 @@ package handler
 import (
 	"net/http"
 
-	"finance-app/backend/internal/usecase"
+	"financebroke/backend/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )

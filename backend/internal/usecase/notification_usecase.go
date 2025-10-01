@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	"finance-app/backend/internal/dto"
-	"finance-app/backend/internal/entity"
-	"finance-app/backend/internal/repository"
-	"finance-app/backend/internal/services"
+	"financebroke/backend/internal/dto"
+	"financebroke/backend/internal/entity"
+	"financebroke/backend/internal/repository"
+	"financebroke/backend/internal/services"
 )
 
 type NotificationUsecase interface {

@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"finance-app/backend/internal/dto"
-	"finance-app/backend/internal/usecase"
-	"finance-app/backend/internal/utils"
+	"financebroke/backend/internal/dto"
+	"financebroke/backend/internal/usecase"
+	"financebroke/backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

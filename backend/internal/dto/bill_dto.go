@@ -1,6 +1,6 @@
 package dto
 
-import "finance-app/backend/internal/entity"
+import "financebroke/backend/internal/entity"
 
 type BillCreateRequest struct {
 	Name         string  `json:"name" binding:"required"`

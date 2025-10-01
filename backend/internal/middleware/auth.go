@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	"finance-app/backend/internal/utils"
+	"financebroke/backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"finance-app/backend/internal/dto"
-	"finance-app/backend/internal/entity"
-	"finance-app/backend/internal/repository"
+	"financebroke/backend/internal/dto"
+	"financebroke/backend/internal/entity"
+	"financebroke/backend/internal/repository"
 	"time"
 )
 

@@ -2,8 +2,8 @@ package repository
 
 import (
 	"database/sql"
-	"finance-app/backend/internal/entity"
-	"finance-app/backend/internal/utils"
+	"financebroke/backend/internal/entity"
+	"financebroke/backend/internal/utils"
 )
 
 type UserRepository interface {
