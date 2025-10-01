@@ -1,4 +1,4 @@
-module finance-app/backend
+module financebroke/backend
 
 go 1.24
 

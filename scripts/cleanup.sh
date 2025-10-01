@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Cleanup Finance App from Kubernetes
+# Cleanup FinanceBroke App from Kubernetes
 set -e
 
-echo "🧹 Cleaning up Finance App from Kubernetes..."
+echo "🧹 Cleaning up FinanceBroke App from Kubernetes..."
 
 # Delete all resources in reverse order
 echo "🗑️ Deleting ingress..."

@@ -95,7 +95,7 @@ helm install \
   --set installCRDs=true
 
 # Clone repository
-REPO_DIR="/opt/finance-app"
+REPO_DIR="/opt/financebroke"
 if [ -d "$REPO_DIR" ]; then
     echo "📁 Updating existing repository..."
     cd $REPO_DIR
@@ -104,7 +104,7 @@ else
     echo "📁 Cloning repository..."
     sudo mkdir -p $REPO_DIR
     sudo chown $USER:$USER $REPO_DIR
-    git clone https://github.com/virhanali/finance-broke.git $REPO_DIR
+    git clone https://github.com/virhanali/financebroke.git $REPO_DIR
     cd $REPO_DIR
 fi
 

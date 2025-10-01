@@ -16,11 +16,11 @@ cd "$(dirname "$0")/.."
 
 # Build and push Docker image
 echo "🐳 Building Docker image..."
-docker build -f Dockerfile.k8s -t finance-app:latest .
+docker build -f Dockerfile.k8s -t financebroke:latest .
 
 # Load image into k3s
 echo "📦 Loading image into k3s..."
-docker save finance-app:latest | sudo k3s ctr images import -
+docker save financebroke:latest | sudo k3s ctr images import -
 
 # Apply Kubernetes manifests
 echo "☸️ Applying Kubernetes manifests..."
@@ -41,24 +41,24 @@ kubectl apply -f k8s/database/deployment.yaml
 
 # Wait for database to be ready
 echo "⏳ Waiting for database to be ready..."
-kubectl wait --for=condition=ready pod -l app=finance-app,component=database -n finance-app --timeout=300s
+kubectl wait --for=condition=ready pod -l app=financebroke,component=database -n financebroke --timeout=300s
 
 # Deploy backend
 kubectl apply -f k8s/backend/deployment.yaml
 
 # Wait for backend to be ready
 echo "⏳ Waiting for backend to be ready..."
-kubectl wait --for=condition=ready pod -l app=finance-app,component=backend -n finance-app --timeout=300s
+kubectl wait --for=condition=ready pod -l app=financebroke,component=backend -n financebroke --timeout=300s
 
 # Apply ingress
 kubectl apply -f k8s/ingress/ingress.yaml
 
 # Get status
 echo "📊 Deployment status:"
-kubectl get pods -n finance-app
-kubectl get services -n finance-app
-kubectl get ingress -n finance-app
+kubectl get pods -n financebroke
+kubectl get services -n financebroke
+kubectl get ingress -n financebroke
 
 echo "✅ Deployment completed!"
 echo "🌐 Your app should be available at your configured domain"
-echo "📊 Check logs with: kubectl logs -f deployment/finance-app-backend -n finance-app"
+echo "📊 Check logs with: kubectl logs -f deployment/financebroke-backend -n financebroke"

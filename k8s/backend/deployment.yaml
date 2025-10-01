@@ -1,57 +1,57 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: finance-app-backend
-  namespace: finance-app
+  name: financebroke-backend
+  namespace: financebroke
   labels:
-    app: finance-app
+    app: financebroke
     component: backend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: finance-app
+      app: financebroke
       component: backend
   template:
     metadata:
       labels:
-        app: finance-app
+        app: financebroke
         component: backend
     spec:
       containers:
       - name: backend
-        image: finance-app:latest
+        image: financebroke:latest
         ports:
         - containerPort: 8080
         env:
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: finance-app-secrets
+              name: financebroke-secrets
               key: DB_PASSWORD
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:
-              name: finance-app-secrets
+              name: financebroke-secrets
               key: JWT_SECRET
         - name: TELEGRAM_BOT_TOKEN
           valueFrom:
             secretKeyRef:
-              name: finance-app-secrets
+              name: financebroke-secrets
               key: TELEGRAM_BOT_TOKEN
         - name: SMTP_USERNAME
           valueFrom:
             secretKeyRef:
-              name: finance-app-secrets
+              name: financebroke-secrets
               key: SMTP_USERNAME
         - name: SMTP_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: finance-app-secrets
+              name: financebroke-secrets
               key: SMTP_PASSWORD
         envFrom:
         - configMapRef:
-            name: finance-app-config
+            name: financebroke-config
         resources:
           requests:
             memory: "128Mi"
@@ -75,11 +75,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: finance-app-service
-  namespace: finance-app
+  name: financebroke-service
+  namespace: financebroke
 spec:
   selector:
-    app: finance-app
+    app: financebroke
     component: backend
   ports:
   - protocol: TCP

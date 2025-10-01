@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 	"os"
-	"finance-app/backend/internal/database"
-	"finance-app/backend/internal/handler"
-	"finance-app/backend/internal/middleware"
-	"finance-app/backend/internal/repository"
-	"finance-app/backend/internal/services"
-	"finance-app/backend/internal/usecase"
+	"financebroke/backend/internal/database"
+	"financebroke/backend/internal/handler"
+	"financebroke/backend/internal/middleware"
+	"financebroke/backend/internal/repository"
+	"financebroke/backend/internal/services"
+	"financebroke/backend/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 )
