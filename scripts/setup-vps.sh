@@ -1,115 +1,96 @@
 #!/bin/bash
 
-# Finance App VPS Setup Script for Kubernetes
+# FinanceBroke VPS Setup Script for Docker
 set -e
 
-echo "🚀 Setting up Finance App on VPS with Kubernetes..."
+echo "🚀 Setting up FinanceBroke on VPS with Docker..."
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root or with sudo"
+    exit 1
+fi
 
 # Update system
 echo "📦 Updating system packages..."
-sudo apt update && sudo apt upgrade -y
+apt update && apt upgrade -y
 
 # Install required packages
 echo "🔧 Installing required packages..."
-sudo apt install -y curl wget git apt-transport-https ca-certificates gnupg lsb-release
+apt install -y curl wget git git htop
 
 # Install Docker
 echo "🐳 Installing Docker..."
 if ! command -v docker &> /dev/null; then
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt update
-    sudo apt install -y docker-ce docker-ce-cli containerd.io
-    sudo usermod -aG docker $USER
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker $SUDO_USER
+    rm get-docker.sh
 fi
 
-# Install Kubernetes components
-echo "☸️ Installing Kubernetes components..."
-# Disable swap
-sudo swapoff -a
-sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
-# Install kubelet, kubeadm, kubectl
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-sudo apt update
-sudo apt install -y kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
-
-# Configure kernel modules for Kubernetes
-echo "🔧 Configuring kernel modules..."
-cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
-overlay
-br_netfilter
-EOF
-
-sudo modprobe overlay
-sudo modprobe br_netfilter
-
-# Configure sysctl
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.bridge.bridge-nf-call-ip6tables = 1
-net.ipv4.ip_forward                 = 1
-EOF
-
-sudo sysctl --system
-
-# Install k3s (lightweight Kubernetes)
-echo "🚀 Installing k3s..."
-if ! command -v k3s &> /dev/null; then
-    curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+# Install Docker Compose
+echo "🔧 Installing Docker Compose..."
+if ! command -v docker-compose &> /dev/null; then
+    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose
 fi
 
-# Wait for k3s to be ready
-echo "⏳ Waiting for k3s to be ready..."
-sleep 30
+# Install Certbot for SSL
+echo "🔒 Installing Certbot for SSL..."
+apt install -y certbot
 
-# Setup kubectl
-mkdir -p ~/.kube
-sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-sudo chown $USER:$USER ~/.kube/config
+# Setup firewall
+echo "🔥 Setting up firewall..."
+ufw --force reset
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow ssh
+ufw allow 80/tcp
+ufw allow 443/tcp
+ufw --force enable
 
-# Install Helm
-echo "📦 Installing Helm..."
-if ! command -v helm &> /dev/null; then
-    curl https://get.helm.sh/helm-v3.13.0-linux-amd64.tar.gz | tar xz
-    sudo mv linux-amd64/helm /usr/local/bin/
-    rm -rf linux-amd64
-fi
+# Create application directory
+echo "📁 Creating application directory..."
+APP_DIR="/opt/financebroke"
+mkdir -p $APP_DIR
+chown $SUDO_USER:$SUDO_USER $APP_DIR
 
-# Install Ingress Controller
-echo "🌐 Installing NGINX Ingress Controller..."
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
-
-# Install Cert-Manager for SSL
-echo "🔒 Installing Cert-Manager..."
-helm repo add jetstack https://charts.jetstack.io
-helm repo update
-helm install \
-  cert-manager jetstack/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --version v1.13.2 \
-  --set installCRDs=true
-
-# Clone repository
-REPO_DIR="/opt/financebroke"
-if [ -d "$REPO_DIR" ]; then
+# Clone or update repository
+if [ -d "$APP_DIR/.git" ]; then
     echo "📁 Updating existing repository..."
-    cd $REPO_DIR
-    git pull origin master
+    cd $APP_DIR
+    sudo -u $SUDO_USER git pull origin master
 else
     echo "📁 Cloning repository..."
-    sudo mkdir -p $REPO_DIR
-    sudo chown $USER:$USER $REPO_DIR
-    git clone https://github.com/virhanali/financebroke.git $REPO_DIR
-    cd $REPO_DIR
+    sudo -u $SUDO_USER git clone https://github.com/virhanali/financebroke.git $APP_DIR
+    cd $APP_DIR
 fi
 
+# Create environment file
+echo "⚙️ Setting up environment configuration..."
+if [ ! -f "$APP_DIR/.env" ]; then
+    sudo -u $SUDO_USER cp $APP_DIR/.env.example $APP_DIR/.env
+    echo "📝 Please edit $APP_DIR/.env with your configuration"
+fi
+
+# Create SSL directory
+echo "🔒 Creating SSL directory..."
+mkdir -p $APP_DIR/ssl
+chown $SUDO_USER:$SUDO_USER $APP_DIR/ssl
+
 echo "✅ VPS setup completed!"
+echo ""
 echo "🔧 Next steps:"
-echo "1. Update the secrets in k8s/backend/secret.yaml"
-echo "2. Update your domain in k8s/ingress/ingress.yaml"
-echo "3. Run: ./scripts/deploy-k8s.sh"
+echo "1. Edit $APP_DIR/.env with your configuration"
+echo "2. Setup SSL: ./scripts/setup-ssl.sh"
+echo "3. Deploy: ./scripts/deploy.sh"
+echo ""
+echo "📱 Your app will be available at:"
+echo "   - HTTP: http://financebroke.virhanali.com"
+echo "   - HTTPS: https://financebroke.virhanali.com (after SSL setup)"
+
+# Log out and back in for docker group to take effect
+echo ""
+echo "⚠️  Log out and back in for Docker group to take effect"
