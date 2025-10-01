@@ -63,6 +63,32 @@ func main() {
 		c.Next()
 	})
 
+	// Health check endpoint
+	r.GET("/api/v1/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"service": "financebroke-api",
+			"version": "1.0.0",
+		})
+	})
+
+	// Ready check endpoint
+	r.GET("/api/v1/ready", func(c *gin.Context) {
+		// Check database connection
+		if database.DB == nil {
+			c.JSON(503, gin.H{
+				"status": "not ready",
+				"error": "database not connected",
+			})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"status": "ready",
+			"database": "connected",
+		})
+	})
+
 	// Public routes
 	public := r.Group("/api/v1")
 	{
